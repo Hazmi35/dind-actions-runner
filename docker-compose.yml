@@ -2,7 +2,8 @@ version: '3'
 
 services:
   docker:
-    image: docker:dind
+    image: docker:20-dind
+    command: dockerd --host=unix:///var/run/docker.sock --tls=false --host=tcp://0.0.0.0:2376
     # Privileged mode is required for DinD.
     privileged: true
     networks:
@@ -11,11 +12,7 @@ services:
     healthcheck:
       test: ["CMD", "docker", "ps"]
       interval: 3s
-    environment:
-      - DOCKER_TLS_CERTDIR=/certs
     volumes:
-      - docker-client-certs:/certs/client
-      - docker-ca-certs:/certs/ca
       - docker-data:/var/lib/docker
     # Remove the labels to disable auto updates
     labels:
@@ -31,13 +28,9 @@ services:
     depends_on:
       docker:
         condition: service_healthy
-    # Don't change these environment vars, it is required for runner container to communicate with Docker daemon
+    # Don't change these environment var, it is required for runner container to communicate with Docker daemon
     environment:
       - DOCKER_HOST=tcp://docker:2376
-      - DOCKER_TLS_VERIFY=1
-      - DOCKER_CERT_PATH=/certs/client
-    volumes:
-      - docker-client-certs:/certs/client
     # Remove the labels to disable auto updates
     labels:
       - com.centurylinklabs.watchtower.scope=actions-runner
@@ -67,6 +60,4 @@ networks:
   runner-network:
 
 volumes:
-  docker-client-certs:
-  docker-ca-certs:
   docker-data:
