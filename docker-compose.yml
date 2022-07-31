@@ -6,7 +6,7 @@ services:
     # Privileged mode is required for DinD.
     privileged: true
     networks:
-      - runner-networks
+      - runner-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "docker", "ps"]
@@ -26,7 +26,7 @@ services:
     image: myoung34/github-runner:latest
     env_file: .env
     networks:
-      - runner-networks
+      - runner-network
     restart: unless-stopped
     depends_on:
       docker:
@@ -49,7 +49,7 @@ services:
     image: containrrr/watchtower:latest
     command: --cleanup --scope actions-runner
     networks:
-      - runner-networks
+      - runner-network
     restart: unless-stopped
     volumes:
       # Needed because watchtower needs to manage containers from host's daemon.
