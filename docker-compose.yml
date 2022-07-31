@@ -15,7 +15,7 @@ services:
       - DOCKER_TLS_CERTDIR=/certs
     volumes:
       - docker-client-certs:/certs/client
-      - docker-client-ca:/certs/ca
+      - docker-ca-certs:/certs/ca
       - docker-data:/var/lib/docker
     # Remove the labels to disable auto updates
     labels:
