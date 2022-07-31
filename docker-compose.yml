@@ -1,0 +1,72 @@
+version: '3'
+
+services:
+  docker:
+    image: docker:dind
+    # Privileged mode is required for DinD.
+    privileged: true
+    networks:
+      - runner-networks
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "docker", "ps"]
+      interval: 3s
+    environment:
+      - DOCKER_TLS_CERTDIR=/certs
+    volumes:
+      - docker-client-certs:/certs/client
+      - docker-client-ca:/certs/ca
+      - docker-data:/var/lib/docker
+    # Remove the labels to disable auto updates
+    labels:
+      - com.centurylinklabs.watchtower.scope=actions-runner
+
+  worker:
+    # You can change the tag for runner image
+    image: myoung34/github-runner:latest
+    env_file: .env
+    networks:
+      - runner-networks
+    restart: unless-stopped
+    depends_on:
+      docker:
+        condition: service_healthy
+    # Don't change these environment vars, it is required for runner container to communicate with Docker daemon
+    environment:
+      - DOCKER_HOST=tcp://docker:2376
+      - DOCKER_TLS_VERIFY=1
+      - DOCKER_CERT_PATH=/certs/client
+    volumes:
+      - docker-client-certs:/certs/client
+    # Remove the labels to disable auto updates
+    labels:
+      - com.centurylinklabs.watchtower.scope=actions-runner
+    # Change the number replicas as you liked, please use EPHEMERAL option in .env if you do this.
+    deploy:
+      replicas: 8
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    command: --cleanup --scope actions-runner
+    networks:
+      - runner-networks
+    restart: unless-stopped
+    volumes:
+      # Needed because watchtower needs to manage containers from host's daemon.
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Sync timezone with host
+      - /etc/localtime:/etc/localtime:ro
+      # This is used to make watchtower uses authenticated request for Docker Hub to prevent limitations
+      # You can remove this, create your own config, or use your own way for authenticated request
+      # To create your own config.json, follow: https://sh.hzmi.xyz/watchtowerauthconfig
+      - $HOME/.docker/config.json:/config.json:ro
+    labels:
+      - com.centurylinklabs.watchtower.scope=actions-runner
+
+networks:
+  runner-network:
+
+volumes:
+  docker-client-certs:
+  docker-ca-certs:
+  docker-data:
