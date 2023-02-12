@@ -2,7 +2,7 @@ version: '3'
 
 services:
   docker:
-    image: docker:20-dind
+    image: docker:23-dind
     command: dockerd --host=unix:///var/run/docker.sock --tls=false --host=tcp://0.0.0.0:2376
     # Privileged mode is required for DinD.
     privileged: true
