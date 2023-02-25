@@ -40,7 +40,7 @@ services:
 
   watchtower:
     image: containrrr/watchtower:latest
-    command: --cleanup --scope actions-runner
+    command: --cleanup --scope actions-runner --schedule "30 0 0 * * *"
     networks:
       - runner-network
     restart: unless-stopped
