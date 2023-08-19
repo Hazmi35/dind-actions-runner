@@ -36,25 +36,7 @@ services:
       - com.centurylinklabs.watchtower.scope=actions-runner
     # Change the number replicas as you liked, please use EPHEMERAL option in .env if you do this.
     deploy:
-      replicas: 8
-
-  watchtower:
-    image: containrrr/watchtower:latest
-    command: --cleanup --scope actions-runner --schedule "30 0 0 * * *"
-    networks:
-      - runner-network
-    restart: unless-stopped
-    volumes:
-      # Needed because watchtower needs to manage containers from host's daemon.
-      - /var/run/docker.sock:/var/run/docker.sock
-      # Sync timezone with host
-      - /etc/localtime:/etc/localtime:ro
-      # This is used to make watchtower uses authenticated request for Docker Hub to prevent limitations
-      # You can remove this, create your own config, or use your own way for authenticated request
-      # To create your own config.json, follow: https://sh.hzmi.xyz/watchtowerauthconfig
-      - $HOME/.docker/config.json:/config.json:ro
-    labels:
-      - com.centurylinklabs.watchtower.scope=actions-runner
+      replicas: 
 
 networks:
   runner-network:
