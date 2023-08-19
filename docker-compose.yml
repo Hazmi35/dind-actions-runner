@@ -16,7 +16,7 @@ services:
       - docker-data:/var/lib/docker
     # Remove the labels to disable auto updates
     labels:
-      - com.centurylinklabs.watchtower.scope=actions-runner
+      - com.centurylinklabs.watchtower.enable=true
 
   worker:
     # You can change the tag for runner image
@@ -33,7 +33,7 @@ services:
       - DOCKER_HOST=tcp://docker:2376
     # Remove the labels to disable auto updates
     labels:
-      - com.centurylinklabs.watchtower.scope=actions-runner
+      - com.centurylinklabs.watchtower.enable=true
     # Change the number replicas as you liked, please use EPHEMERAL option in .env if you do this.
     deploy:
       replicas: 8
