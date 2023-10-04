@@ -21,7 +21,7 @@ services:
   worker:
     # You can change the tag for runner image
     image: myoung34/github-runner:latest
-    env_file: .env
+    env_file: runner.env
     networks:
       - runner-network
     restart: unless-stopped
@@ -37,9 +37,23 @@ services:
     # Change the number replicas as you liked, please use EPHEMERAL option in .env if you do this.
     deploy:
       replicas: 8
+  
+  turborepo:
+    image: docker.io/ducktors/turborepo-remote-cache:latest
+    env_file: turborepo.env
+    networks:
+      - runner-network
+    ports:
+      - 3000:3000
+    volumes:
+      - turborepo-cache-data:/store
+  
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
 
 networks:
   runner-network:
 
 volumes:
   docker-data:
+  turborepo-cache-data:
